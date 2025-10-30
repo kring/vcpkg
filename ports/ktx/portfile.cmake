@@ -1,17 +1,17 @@
 vcpkg_from_github(
     OUT_SOURCE_PATH SOURCE_PATH
-    REPO KhronosGroup/KTX-Software
-    REF "v${VERSION}"
-    SHA512 0077315fe2b4e676e97e3a158c2c6e1f6ba426e14ad23342592cd69be28cfce64c40614e0a84d58a9634877ab334e713b94d4c962132c98bfea308e91bc8a98a
-    HEAD_REF master
+    REPO kring/KTX-Software
+    REF 9dc43d4439829b390ccc7762be5c88630f5e39af  # "v${VERSION}"
+    SHA512 3d246120aff89fcca7077caaf008ad05ee8d8a187dfdd2af093fb397aeee04909b710efdef2af3065c5522b9b36c99a4e35b20a4a99ca382e7555029be629ebc
+    HEAD_REF main
     PATCHES
-        0001-Use-vcpkg-zstd.patch
-        0002-Fix-versioning.patch
-        0003-mkversion.patch
-        0004-quirks.patch
-        0005-no-vendored-libs.patch
-        0006-fix-ios-install.patch
+        #0003-mkversion.patch
+        #0004-quirks.patch
+        #0005-no-vendored-libs.patch
+        #0006-fix-ios-install.patch
 )
+
+# Remove zstd files to avoid conflicts with zstd port
 file(REMOVE "${SOURCE_PATH}/other_include/zstd_errors.h")
 file(REMOVE_RECURSE "${SOURCE_PATH}/external/basisu/zstd")
 file(REMOVE_RECURSE "${SOURCE_PATH}/lib/basisu/zstd")
@@ -33,21 +33,21 @@ if(VCPKG_TARGET_IS_WINDOWS)
     vcpkg_list(APPEND OPTIONS "-DBASH_EXECUTABLE=${MSYS_ROOT}/usr/bin/bash.exe")
 endif()
 
-string(COMPARE EQUAL "${VCPKG_LIBRARY_LINKAGE}" "static" ENABLE_STATIC)
-
 vcpkg_check_features(OUT_FEATURE_OPTIONS FEATURE_OPTIONS
     FEATURES
         tools   KTX_FEATURE_TOOLS
-        vulkan  KTX_FEATURE_VK_UPLOAD
+        vulkan  LIBKTX_FEATURE_VK_UPLOAD
+        js      KTX_FEATURE_JS
 )
 
 vcpkg_cmake_configure(
     SOURCE_PATH "${SOURCE_PATH}"
     OPTIONS
-        -DKTX_VERSION_FULL=v${VERSION}
+        -DKTX_GIT_VERSION_FULL=v${VERSION}
         -DKTX_FEATURE_TESTS=OFF
         -DKTX_FEATURE_LOADTEST_APPS=OFF
-        -DKTX_FEATURE_STATIC_LIBRARY=${ENABLE_STATIC}
+        -DKTX_FEATURE_EMBEDDED_ZSTD=OFF
+        -DKTX_FEATURE_EMBEDDED_TOOLS_DEPENDENCIES=OFF
         ${FEATURE_OPTIONS}
         ${OPTIONS}
     DISABLE_PARALLEL_CONFIGURE
@@ -66,9 +66,9 @@ if(tools IN_LIST FEATURES)
             ktx2check
         AUTO_CLEAN
     )
-else()
-    vcpkg_copy_pdbs()
 endif()
+
+vcpkg_copy_pdbs()
 
 vcpkg_cmake_config_fixup(CONFIG_PATH lib/cmake/ktx)
 
