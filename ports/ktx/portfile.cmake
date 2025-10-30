@@ -1,8 +1,8 @@
 vcpkg_from_github(
     OUT_SOURCE_PATH SOURCE_PATH
     REPO kring/KTX-Software
-    REF 9dc43d4439829b390ccc7762be5c88630f5e39af  # "v${VERSION}"
-    SHA512 3d246120aff89fcca7077caaf008ad05ee8d8a187dfdd2af093fb397aeee04909b710efdef2af3065c5522b9b36c99a4e35b20a4a99ca382e7555029be629ebc
+    REF "v${VERSION}"
+    SHA512 78fc05a6527d8aad08f284a82ebc3b49acd270fec4f70fa6ccd8df135ebcc995858eb203200d30468a5afc635ea67cf274a291c87ec88b58563ef1fed2ef05d4
     HEAD_REF main
     PATCHES
         #0003-mkversion.patch
